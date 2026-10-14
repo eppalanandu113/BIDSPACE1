@@ -36,9 +36,9 @@ const auctions = [
     id: 2,
     title: "Vintage Chanel Quilted Handbag — Classic Flap",
     category: "fashion",
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76acc0?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=600&h=400&fit=crop",
     images: [
-      "https://images.unsplash.com/photo-1584917865442-de89df76acc0?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?w=800&h=600&fit=crop",
       "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=800&h=600&fit=crop"
     ],
     currentBid: 3200,
