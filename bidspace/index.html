@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BIDSPACE — Discover Rare Treasures</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-gavel"></i> BIDSPACE
+      </a>
+
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="globalSearch" placeholder="Search items, categories, auctioneers..." />
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn-outline" onclick="openModal('loginModal')">
+          <i class="fas fa-user"></i> Log In
+        </button>
+        <button class="btn-primary" onclick="openModal('registerModal')">Join</button>
+        <button class="btn-icon" id="watchlistBtn" title="Watchlist" onclick="showWatchlist()">
+          <i class="fas fa-heart"></i>
+          <span class="badge" id="watchCount">0</span>
+        </button>
+      </div>
+
+      <button class="mobile-toggle" id="mobileToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+
+    <nav class="category-nav">
+      <a href="#" data-cat="all">All</a>
+      <a href="#" data-cat="art">Art</a>
+      <a href="#" data-cat="jewelry">Jewelry</a>
+      <a href="#" data-cat="furniture">Furniture</a>
+      <a href="#" data-cat="collectibles">Collectibles</a>
+      <a href="#" data-cat="fashion">Fashion</a>
+      <a href="#" data-cat="decor">Home & Décor</a>
+      <a href="#" data-cat="coins">Coins</a>
+      <a href="pages/auctions.html">Upcoming Auctions</a>
+      <a href="pages/how-to-bid.html">How to Bid</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Let’s go treasure-hunting.</h1>
+      <p>Join the college’s best auctions for one-of-a-kind art, antiques & luxury goods.</p>
+      <div class="hero-cta">
+        <input type="email" placeholder="Enter your email" id="heroEmail" />
+        <button class="btn-primary" onclick="openModal('registerModal')">JOIN FREE</button>
+      </div>
+    </div>
+    <div class="hero-cards" id="heroCards">
+      <!-- Filled by JS -->
+    </div>
+  </section>
+
+  <!-- Featured Auctions -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Featured Auctions</h2>
+      <a href="pages/auctions.html" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+    </div>
+    <div class="auction-grid" id="featuredAuctions">
+      <!-- Filled by JS -->
+    </div>
+  </section>
+
+  <!-- Categories Showcase -->
+  <section class="section categories-section">
+    <div class="section-header">
+      <h2>Explore Categories</h2>
+    </div>
+    <div class="category-grid" id="categoryGrid">
+      <!-- Filled by JS -->
+    </div>
+  </section>
+
+  <!-- Live / Ending Soon -->
+  <section class="section">
+    <div class="section-header">
+      <h2><i class="fas fa-bolt" style="color:#e74c3c"></i> Ending Soon</h2>
+      <a href="pages/auctions.html" class="view-all">See More</a>
+    </div>
+    <div class="ending-grid" id="endingSoon">
+      <!-- Filled by JS -->
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section how-it-works">
+    <h2>How BIDSPACE Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+        <h3>1. Create Account</h3>
+        <p>Sign up free in seconds. Verify your student email for exclusive campus auctions.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon"><i class="fas fa-search-dollar"></i></div>
+        <h3>2. Discover Items</h3>
+        <p>Browse thousands of unique lots across art, jewelry, furniture and more.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon"><i class="fas fa-gavel"></i></div>
+        <h3>3. Place Your Bid</h3>
+        <p>Bid live or set max bids. Get real-time updates when you’re outbid.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon"><i class="fas fa-trophy"></i></div>
+        <h3>4. Win & Collect</h3>
+        <p>Win the item, pay securely, and arrange pickup or campus delivery.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3><i class="fas fa-gavel"></i> BIDSPACE</h3>
+        <p>The premier student auction platform. Discover rare finds, support campus causes, and bid with confidence.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="pages/auctions.html">Upcoming Auctions</a>
+        <a href="#">Price Results</a>
+        <a href="pages/how-to-bid.html">How to Bid</a>
+        <a href="#">Seller Guide</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="#" onclick="openModal('loginModal')">Log In</a>
+        <a href="#" onclick="openModal('registerModal')">Register</a>
+        <a href="#">My Bids</a>
+        <a href="#">Watchlist</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 BIDSPACE — Built for College Showcase</p>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+      <h2>Welcome Back</h2>
+      <p class="modal-sub">Log in to continue bidding</p>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" required placeholder="you@college.edu" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn-primary full">Log In</button>
+      </form>
+      <p class="modal-footer-text">Don’t have an account? <a href="#" onclick="switchModal('loginModal','registerModal')">Join BIDSPACE</a></p>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+      <h2>Join BIDSPACE</h2>
+      <p class="modal-sub">Create your free account</p>
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" required placeholder="Alex Rivera" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" required placeholder="you@college.edu" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" required placeholder="Min. 8 characters" minlength="8" />
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" required /> I agree to the Terms & Privacy Policy
+          </label>
+        </div>
+        <button type="submit" class="btn-primary full">Create Account</button>
+      </form>
+      <p class="modal-footer-text">Already have an account? <a href="#" onclick="switchModal('registerModal','loginModal')">Log In</a></p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

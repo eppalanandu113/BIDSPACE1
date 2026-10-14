@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auction Detail — BIDSPACE</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="logo">
+        <i class="fas fa-gavel"></i> BIDSPACE
+      </a>
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="globalSearch" placeholder="Search items..." />
+      </div>
+      <div class="nav-actions">
+        <button class="btn-outline" onclick="openModal('loginModal')">
+          <i class="fas fa-user"></i> Log In
+        </button>
+        <button class="btn-primary" onclick="openModal('registerModal')">Join</button>
+        <button class="btn-icon" id="watchlistBtn" title="Watchlist" onclick="showWatchlist()">
+          <i class="fas fa-heart"></i>
+          <span class="badge" id="watchCount">0</span>
+        </button>
+      </div>
+    </div>
+    <nav class="category-nav">
+      <a href="../index.html">Home</a>
+      <a href="auctions.html">All Auctions</a>
+      <a href="how-to-bid.html">How to Bid</a>
+    </nav>
+  </header>
+
+  <div class="detail-page">
+    <div class="detail-grid">
+      <!-- Gallery -->
+      <div class="detail-gallery">
+        <img id="mainImg" class="main-img" src="" alt="Auction item" />
+        <div class="detail-thumbs" id="thumbs"></div>
+      </div>
+
+      <!-- Bidding Panel -->
+      <div class="detail-info">
+        <div class="lot-num" id="lotNum">LOT-0000</div>
+        <h1 id="itemTitle">Loading...</h1>
+        <div class="seller">Sold by <a href="#" id="sellerName">Seller</a></div>
+
+        <div class="bid-box">
+          <div class="current">Current Bid</div>
+          <div class="amount" id="currentAmount">$0</div>
+          <div class="timer-row">
+            <span id="bidCount">0 bids</span>
+            <span class="timer" id="timerDisplay"><i class="fas fa-clock"></i> --</span>
+          </div>
+
+          <div class="bid-input-row">
+            <input type="number" id="bidAmount" step="25" />
+            <button class="bid-btn" onclick="placeBid()">Place Bid</button>
+          </div>
+
+          <div class="quick-bids" id="quickBids"></div>
+
+          <button class="btn-outline" style="width:100%;margin-top:0.5rem" id="detailWatch">
+            <i class="fas fa-heart"></i> Add to Watchlist
+          </button>
+        </div>
+
+        <div class="bid-history">
+          <h3>Bid History</h3>
+          <div class="bid-list" id="bidHistory"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="desc-section">
+      <h2>Description</h2>
+      <p id="description">Loading description...</p>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h3><i class="fas fa-gavel"></i> BIDSPACE</h3>
+        <p>The premier student auction platform.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="auctions.html">All Auctions</a>
+        <a href="how-to-bid.html">How to Bid</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="#" onclick="openModal('loginModal')">Log In</a>
+        <a href="#" onclick="openModal('registerModal')">Register</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 BIDSPACE — Built for College Showcase</p>
+    </div>
+  </footer>
+
+  <!-- Modals -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+      <h2>Welcome Back</h2>
+      <p class="modal-sub">Log in to continue bidding</p>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" required placeholder="you@college.edu" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn-primary full">Log In</button>
+      </form>
+      <p class="modal-footer-text">Don’t have an account? <a href="#" onclick="switchModal('loginModal','registerModal')">Join BIDSPACE</a></p>
+    </div>
+  </div>
+
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+      <h2>Join BIDSPACE</h2>
+      <p class="modal-sub">Create your free account</p>
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" required placeholder="Alex Rivera" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" required placeholder="you@college.edu" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" required minlength="8" placeholder="Min. 8 characters" />
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" required /> I agree to the Terms</label>
+        </div>
+        <button type="submit" class="btn-primary full">Create Account</button>
+      </form>
+      <p class="modal-footer-text">Already have an account? <a href="#" onclick="switchModal('registerModal','loginModal')">Log In</a></p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>
