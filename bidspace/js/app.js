@@ -142,29 +142,347 @@ function logout() {
   showToast('Logged out successfully');
 }
 
+function showProfile() {
+  if (!currentUser) {
+    showToast('Please log in to view your profile', 'error');
+    return;
+  }
+
+  const oldProfile = document.getElementById('profileOverlay');
+  if (oldProfile) oldProfile.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'profileOverlay';
+
+  Object.assign(overlay.style, {
+    position: 'fixed',
+    inset: '0',
+    background: 'rgba(0,0,0,0.55)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: '99999',
+    padding: '20px'
+  });
+
+  const card = document.createElement('div');
+
+  Object.assign(card.style, {
+    background: 'var(--card, #ffffff)',
+    color: 'var(--text, #222222)',
+    padding: '30px',
+    borderRadius: '18px',
+    width: '100%',
+    maxWidth: '400px',
+    boxShadow: '0 15px 50px rgba(0,0,0,0.2)'
+  });
+
+  const title = document.createElement('h2');
+  title.textContent = 'My Profile';
+
+  const avatar = document.createElement('div');
+  avatar.textContent = (currentUser.name || 'U')
+    .trim().charAt(0).toUpperCase();
+
+  Object.assign(avatar.style, {
+    width: '65px',
+    height: '65px',
+    borderRadius: '50%',
+    background: 'var(--green, #1f7653)',
+    color: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '28px',
+    margin: '20px auto'
+  });
+
+  const name = document.createElement('p');
+  name.textContent = 'Name: ' + (currentUser.name || 'Not provided');
+
+  const email = document.createElement('p');
+  email.textContent = 'Email: ' + (currentUser.email || 'Not provided');
+
+const dashboardButton = document.createElement('button');
+dashboardButton.textContent = 'Account Dashboard';
+dashboardButton.className = 'btn-primary';
+dashboardButton.style.marginBottom = '10px';
+dashboardButton.onclick = showAccountDashboard;
+
+  const bidsButton = document.createElement('button');
+  bidsButton.textContent = 'My Bids';
+  bidsButton.className = 'btn-outline';
+  bidsButton.style.marginRight = '10px';
+  bidsButton.style.marginTop = '15px';
+  bidsButton.onclick = () => {
+    overlay.remove();
+    showMyBids();
+  };
+
+  const closeButton = document.createElement('button');
+  closeButton.textContent = 'Close';
+  closeButton.className = 'btn-outline';
+  closeButton.style.marginTop = '15px';
+  closeButton.onclick = () => overlay.remove();
+
+
+  card.append(title, avatar, name, email, dashboardButton, bidsButton, closeButton);
+  overlay.appendChild(card);
+
+
+  overlay.addEventListener('click', event => {
+    if (event.target === overlay) overlay.remove();
+  });
+
+  document.body.appendChild(overlay);
+}
+
+async function showMyBids() {
+  const token = localStorage.getItem('bidspace_token');
+
+  if (!token) {
+    showToast('Please log in to view your bids', 'error');
+    openModal('loginModal');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/bids/mine`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Cache-Control': 'no-cache'
+      },
+      cache: 'no-store'
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showToast(data.error || 'Could not load your bids', 'error');
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'myBidsOverlay';
+
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      inset: '0',
+      background: 'rgba(0,0,0,0.6)',
+      zIndex: '99999',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '20px'
+    });
+
+    const card = document.createElement('div');
+
+    Object.assign(card.style, {
+      background: 'var(--card, #fff)',
+      color: 'var(--text, #222)',
+      padding: '25px',
+      borderRadius: '16px',
+      width: '100%',
+      maxWidth: '650px',
+      maxHeight: '80vh',
+      overflowY: 'auto'
+    });
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'My Bids';
+    card.appendChild(heading);
+
+    const bids = data.bids || [];
+
+    if (bids.length === 0) {
+      const empty = document.createElement('p');
+      empty.textContent = 'You have not placed any bids yet.';
+      card.appendChild(empty);
+    } else {
+      bids.forEach(bid => {
+        const item = document.createElement('div');
+
+        Object.assign(item.style, {
+          padding: '15px 0',
+          borderBottom: '1px solid #ddd'
+        });
+
+        const title = document.createElement('h3');
+        title.textContent = bid.title || 'Auction item';
+
+        const yourBid = document.createElement('p');
+        yourBid.textContent =
+          'Your latest bid: ' +
+          formatCurrency(Number(bid.yourBid) || 0);
+
+        const currentBid = document.createElement('p');
+        currentBid.textContent =
+          'Current auction price: ' +
+          formatCurrency(Number(bid.currentBid) || 0);
+
+        const date = document.createElement('p');
+        date.textContent = 'Bid placed: ' + (bid.bidAt || 'Unavailable');
+
+        const openButton = document.createElement('button');
+        openButton.className = 'btn-outline';
+        openButton.textContent = 'View Auction';
+        openButton.onclick = () => {
+          window.location.href =
+            `detail.html?id=${encodeURIComponent(bid.auctionId)}`;
+        };
+
+        item.append(title, yourBid, currentBid, date, openButton);
+        card.appendChild(item);
+      });
+    }
+
+    const closeButton = document.createElement('button');
+    closeButton.className = 'btn-outline';
+    closeButton.textContent = 'Close';
+    closeButton.style.marginTop = '20px';
+    closeButton.onclick = () => overlay.remove();
+
+    card.appendChild(closeButton);
+    overlay.appendChild(card);
+
+    overlay.addEventListener('click', event => {
+      if (event.target === overlay) overlay.remove();
+    });
+
+    document.body.appendChild(overlay);
+  } catch (error) {
+    console.error('My Bids error:', error);
+    showToast('Unable to load your bids. Please try again.', 'error');
+  }
+}
+
+async function showAccountDashboard() {
+  const token = localStorage.getItem('bidspace_token');
+
+  if (!token) {
+    showToast('Please log in first', 'error');
+    openModal('loginModal');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store'
+    });
+
+    const stats = await response.json();
+
+    if (!response.ok) {
+      showToast(stats.error || 'Could not load dashboard', 'error');
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      inset: '0',
+      background: 'rgba(0,0,0,0.6)',
+      zIndex: '99999',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '20px'
+    });
+
+    const card = document.createElement('div');
+    Object.assign(card.style, {
+      background: '#fff',
+      color: '#222',
+      padding: '25px',
+      borderRadius: '16px',
+      width: '100%',
+      maxWidth: '600px'
+    });
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Account Dashboard';
+    card.appendChild(heading);
+
+    const grid = document.createElement('div');
+    Object.assign(grid.style, {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      gap: '15px'
+    });
+
+    [
+      ['Auctions Created', stats.listings],
+      ['Auctions Bid On', stats.bids],
+      ['Watchlist Items', stats.watchlist],
+      ['Total Paid', formatCurrency(stats.totalPaid || 0)]
+    ].forEach(([label, value]) => {
+      const box = document.createElement('div');
+      Object.assign(box.style, {
+        border: '1px solid #ddd',
+        borderRadius: '12px',
+        padding: '18px'
+      });
+
+      const labelEl = document.createElement('p');
+      labelEl.textContent = label;
+
+      const valueEl = document.createElement('h3');
+      valueEl.textContent = value ?? 0;
+      valueEl.style.color = '#1f7653';
+
+      box.append(labelEl, valueEl);
+      grid.appendChild(box);
+    });
+
+    const closeButton = document.createElement('button');
+    closeButton.className = 'btn-outline';
+    closeButton.textContent = 'Close';
+    closeButton.style.marginTop = '20px';
+    closeButton.onclick = () => overlay.remove();
+
+    card.append(grid, closeButton);
+    overlay.appendChild(card);
+
+    overlay.onclick = event => {
+      if (event.target === overlay) overlay.remove();
+    };
+
+    document.body.appendChild(overlay);
+
+  } catch (error) {
+    console.error('Dashboard error:', error);
+    showToast('Unable to load dashboard', 'error');
+  }
+}
+
+
 function updateNav() {
   const actions = document.querySelector('.nav-actions');
   if (!actions) return;
 
   if (currentUser) {
     actions.innerHTML = `
-      <span style="font-weight:600;font-size:0.9rem;color:var(--text)">Hi, ${currentUser.name}</span>
-      <button class="btn-outline" onclick="logout()">Log Out</button>
-      <button class="btn-icon" id="watchlistBtn" title="Watchlist" onclick="showWatchlist()">
+      <span style="font-weight:600;font-size:0.9rem;color:var(--text)">
+        Hi, ${currentUser.name || 'User'}
+      </span>
+
+      <button class="btn-outline" onclick="showProfile()">
+        <i class="fas fa-user-circle"></i> My Profile
+      </button>
+
+      <button class="btn-icon" id="watchlistBtn"
+        title="Watchlist" onclick="showWatchlist()">
         <i class="fas fa-heart"></i>
         <span class="badge" id="watchCount">${watchlist.length}</span>
       </button>
+
+      <button class="btn-outline" onclick="logout()">Log Out</button>
     `;
-  } else {
-    // Ensure heart button always has click handler even when logged out
-    const btn = document.getElementById('watchlistBtn');
-    if (btn) {
-      btn.onclick = showWatchlist;
-      const badge = document.getElementById('watchCount');
-      if (badge) badge.textContent = watchlist.length;
-    }
   }
 }
+
 
 // ========== WATCHLIST ==========
 function toggleWatch(id, e) {
@@ -465,74 +783,151 @@ function changeImage(el, src) {
   document.querySelectorAll('.detail-thumbs img').forEach(img => img.classList.remove('active'));
   el.classList.add('active');
 }
-
 function setBidAmount(val) {
   const input = document.getElementById('bidAmount');
-  if (input) input.value = val;
+  if (!input) return;
+
+  input.value = val;
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  input.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
-function placeBid() {
+async function placeBid() {
+  // Your existing placeBid code continues here...
+}
+async function placeBid() {
   if (!currentUser) {
     openModal('loginModal');
     showToast('Please log in to place a bid', 'error');
     return;
   }
 
-  const params = new URLSearchParams(window.location.search);
-  const id = parseInt(params.get('id'));
+  const id = Number(new URLSearchParams(window.location.search).get('id'));
   const auction = auctions.find(a => a.id === id);
-  if (!auction) return;
-
   const input = document.getElementById('bidAmount');
-  const amount = parseInt(input.value);
 
-  if (isNaN(amount) || amount < auction.currentBid + 25) {
-    showToast(`Bid must be at least ${formatCurrency(auction.currentBid + 25)}`, 'error');
+  if (!auction || !input) return;
+
+  const amount = Number(input.value);
+  const minBid = Number(auction.currentBid) + 500;
+
+  if (!Number.isFinite(amount) || amount < minBid) {
+    showToast(`Bid must be at least ${formatCurrency(minBid)}`, 'error');
     return;
   }
 
-  // Update auction
-  auction.currentBid = amount;
-  auction.bids += 1;
-  auction.bidHistory.unshift({
-    bidder: currentUser.name,
-    amount,
-    time: 'Just now'
-  });
+  const token = localStorage.getItem('bidspace_token');
 
-  // Track user bid
-  if (!userBids[id]) userBids[id] = [];
-  userBids[id].push({ amount, time: new Date().toISOString() });
-  saveState();
-
-  // Re-render
-  document.getElementById('currentAmount').textContent = formatCurrency(amount);
-  document.getElementById('bidCount').textContent = `${auction.bids} bids`;
-  document.getElementById('bidHistory').innerHTML = auction.bidHistory.map(b => `
-    <div class="bid-item">
-      <span class="bidder">${b.bidder}</span>
-      <span>${formatCurrency(b.amount)}</span>
-      <span class="time">${b.time}</span>
-    </div>
-  `).join('');
-
-  const minBid = amount + 25;
-  input.min = minBid;
-  input.value = minBid;
-
-  // Update quick bids
-  const quick = document.getElementById('quickBids');
-  if (quick) {
-    const increments = [25, 50, 100, 250];
-    quick.innerHTML = increments.map(inc => {
-      const val = amount + inc;
-      return `<button class="quick-bid" onclick="setBidAmount(${val})">${formatCurrency(val)}</button>`;
-    }).join('');
+  if (!token) {
+    showToast('Please log in again before bidding', 'error');
+    openModal('loginModal');
+    return;
   }
 
-  showToast(`Bid of ${formatCurrency(amount)} placed successfully!`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/bids`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ auctionId: id, amount })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      showToast(result.error || 'Could not place bid', 'error');
+      await refreshAuctionFromServer(id);
+      return;
+    }
+
+    await refreshAuctionFromServer(id);
+    showToast(result.message || 'Bid placed successfully!');
+  } catch (error) {
+    console.error('Bid error:', error);
+    showToast('Unable to contact the auction server. Try again.', 'error');
+  }
 }
 
+async function refreshAuctionFromServer(id) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auctions/${id}`, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    const serverAuction = data.auction;
+    const auction = auctions.find(a => a.id === id);
+
+    if (!serverAuction || !auction) return;
+
+    auction.currentBid = serverAuction.currentBid;
+    auction.bids = serverAuction.bids;
+    auction.bidHistory = serverAuction.bidHistory || [];
+    auction.endsIn = serverAuction.endsIn;
+    auction.status = serverAuction.status;
+
+    const amountEl = document.getElementById('currentAmount');
+    const countEl = document.getElementById('bidCount');
+    const historyEl = document.getElementById('bidHistory');
+    const timerEl = document.getElementById('timerDisplay');
+
+    if (amountEl) amountEl.textContent = formatCurrency(auction.currentBid);
+    if (countEl) countEl.textContent = `${auction.bids} bids`;
+
+    if (historyEl) {
+      historyEl.innerHTML = auction.bidHistory.map(b => `
+        <div class="bid-item">
+          <span class="bidder">${b.bidder}</span>
+          <span>${formatCurrency(b.amount)}</span>
+          <span class="time">${b.time}</span>
+        </div>
+      `).join('');
+    }
+
+    if (timerEl) {
+      timerEl.dataset.ends = auction.endsIn;
+      timerEl.textContent = formatTime(auction.endsIn);
+    }
+
+    const minBid = Number(auction.currentBid) + 500;
+    inputUpdate(minBid);
+
+    const quick = document.getElementById('quickBids');
+    if (quick) {
+      quick.innerHTML = [500, 1000, 2000, 5000].map(inc => {
+        const val = Number(auction.currentBid) + inc;
+        return `<button class="quick-bid" onclick="setBidAmount(${val})">${formatCurrency(val)}</button>`;
+      }).join('');
+    }
+
+    function inputUpdate(minBid) {
+      const input = document.getElementById('bidAmount');
+      if (!input) return;
+      input.min = minBid;
+      input.placeholder = `Min ${formatCurrency(minBid)}`;
+      if (!input.value || Number(input.value) < minBid) input.value = minBid;
+    }
+  } catch (error) {
+    console.error('Auction refresh error:', error);
+  }
+}
+// ========== AUTOMATIC LIVE BID UPDATES ==========
+function startLiveBidUpdates() {
+  const params = new URLSearchParams(window.location.search);
+  const id = Number(params.get('id'));
+
+  // Only run on an auction detail page.
+  if (!window.location.pathname.includes('detail.html') || !id) return;
+
+  // Refresh the shared bid amount and history every 3 seconds.
+  setInterval(() => {
+    refreshAuctionFromServer(id);
+  }, 3000);
+}
 // ========== LIVE TIMERS ==========
 function startTimers() {
   setInterval(() => {
@@ -581,6 +976,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateNav();
   setupSearch();
   startTimers();
+  startLiveBidUpdates();
 
   const path = window.location.pathname;
 
